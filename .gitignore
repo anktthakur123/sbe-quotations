@@ -1,0 +1,9 @@
+.gradle/
+.idea/
+local.properties
+**/build/
+*.iml
+.DS_Store
+app/signing/*.keystore
+sbe-release.keystore
+keystore-base64.txt

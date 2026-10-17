@@ -1,0 +1,40 @@
+plugins { id 'com.android.application' }
+
+def appVersionCode = (project.findProperty('appVersionCode') ?: '1').toString().toInteger()
+def appVersionName = (project.findProperty('appVersionName') ?: '1.0.0').toString()
+def githubOwner = (System.getenv('GITHUB_OWNER') ?: project.findProperty('githubOwner') ?: 'YOUR_GITHUB_USERNAME').toString()
+def githubRepo = (System.getenv('GITHUB_REPO') ?: project.findProperty('githubRepo') ?: 'sbe-quotations').toString()
+def signingKeyFile = file('signing/sbe-release.keystore')
+
+android {
+    namespace 'com.sidhbaba.quotations'
+    compileSdk 36
+    buildFeatures { buildConfig true }
+    defaultConfig {
+        applicationId 'com.sidhbaba.quotations'
+        minSdk 30
+        targetSdk 36
+        versionCode appVersionCode
+        versionName appVersionName
+        buildConfigField 'String', 'GITHUB_OWNER', '"' + githubOwner.replace('\\', '\\\\').replace('"', '\\"') + '"'
+        buildConfigField 'String', 'GITHUB_REPO', '"' + githubRepo.replace('\\', '\\\\').replace('"', '\\"') + '"'
+    }
+    signingConfigs {
+        release {
+            storeFile signingKeyFile
+            storePassword System.getenv('SBE_KEYSTORE_PASSWORD') ?: ''
+            keyAlias System.getenv('SBE_KEY_ALIAS') ?: 'sbequotations'
+            keyPassword System.getenv('SBE_KEY_PASSWORD') ?: ''
+        }
+    }
+    buildTypes {
+        debug { applicationIdSuffix '.debug'; versionNameSuffix '-debug' }
+        release { minifyEnabled false; signingConfig signingConfigs.release }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies { implementation 'androidx.core:core:1.16.0' }
